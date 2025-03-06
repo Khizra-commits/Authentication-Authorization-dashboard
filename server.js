@@ -22,43 +22,6 @@ const pool = new Pool({
   port: 5432,
 });
 
-// // Passport Local Strategy (For username/password authentication)
-// passport.use(
-//   new LocalStrategy(async (email, password, done) => {
-//     try {
-//       const user = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
-//       if (user.rows.length === 0) return done(null, false, { message: "User not found" });
-
-//       const isValid = await bcrypt.compare(password, user.rows[0].password);
-//       return isValid ? done(null, user.rows[0]) : done(null, false, { message: "Incorrect password" });
-//     } catch (err) {
-//       return done(err);
-//     }
-//   })
-// );
-
-// const server = OAuth2orize.createServer();
-
-// const clients = [{ id: "client1", secret: "secret123", redirectUris: ["http://localhost:3000/dashboard"] }];
-
-// server.exchange(
-//   OAuth2orize.exchange.password(async (client, email, password, done) => {
-//     const user = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
-//     if (user.rows.length === 0) return done(null, false);
-
-//     const isValid = await bcrypt.compare(password, user.rows[0].password);
-//     if (!isValid) return done(null, false);
-
-//     const accessToken = jwt.sign({ email }, process.env.ACCESS_SECRET, { expiresIn: "15m" });
-//     const refreshToken = jwt.sign({ email }, process.env.REFRESH_SECRET, { expiresIn: "7d" });
-
-//     return done(null, accessToken, refreshToken);
-//   })
-// );
-// app.post("/oauth/token", passport.authenticate("local", { session: false }), server.token(), (req, res) => {
-//   res.json({ access_token: req.authInfo });
-// });
-
 // Signup Route
 app.post("/signup", async (req, res) => {
   const { email, password, role = "User" } = req.body;
@@ -105,17 +68,6 @@ app.post("/refresh", (req, res) => {
 
     const accessToken = jwt.sign({ email: user.email }, process.env.ACCESS_SECRET, { expiresIn: "15m" });
     res.json({ accessToken });
-  });
-});
-
-// Protected Route
-app.get("/protected", (req, res) => {
-  const token = req.headers.authorization?.split(" ")[1];
-  if (!token) return res.status(401).json({ error: "Unauthorized" });
-
-  jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
-    if (err) return res.status(403).json({ error: "Forbidden" });
-    res.json({ message: "Protected data", user });
   });
 });
 
