@@ -6,27 +6,50 @@ function AdminDashboard() {
   const [users, setUsers] = useState([]);
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState(localStorage.getItem("accessToken"));
 
   useEffect(() => {
-    axios.get("http://localhost:5000/admin/users", { withCredentials: true })
+    if (!token) {
+      console.error("No token found");
+      return;
+    }
+
+    axios
+      .get("http://localhost:5000/admin/users", {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+      })
       .then((res) => setUsers(res.data))
       .catch((err) => console.error(err));
 
-    axios.get("http://localhost:5000/admin/logs", { withCredentials: true })
+    axios
+      .get("http://localhost:5000/admin/logs", {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+      })
       .then((res) => setLogs(res.data))
       .catch((err) => console.error(err));
 
     setLoading(false);
-  }, []);
+  }, [token]); // Runs only when token changes
 
-  const updateRole = (id, role) => {
-    axios.put(`http://localhost:5000/admin/users/${id}/role`, { role }, { withCredentials: true })
+const updateRole = (id, role) => {
+    axios
+      .put(
+        `http://localhost:5000/admin/users/${id}/role`,
+        { role },
+        {
+          headers: { Authorization: `Bearer ${token}` }, // Include the token
+          withCredentials: true,
+        }
+      )
       .then(() => {
         alert("Role updated");
         setUsers(users.map(user => user.id === id ? { ...user, role } : user));
       })
       .catch((err) => console.error(err));
   };
+
 
   if (loading) return <h2>Loading...</h2>;
 

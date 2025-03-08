@@ -18,11 +18,11 @@ function Login() {
 
       localStorage.setItem("accessToken", response.data.accessToken); // Store token
       localStorage.setItem("role", response.data.role); // Store role
-
       // Redirect based on role
       if (response.data.role === "admin") {
         navigate("/admin-dashboard");
-      } else if (["manager", "user"].includes(response.data.role)) {
+      } else
+    if (["manager", "user"].includes(response.data.role)) {
         navigate("/dashboard");
       } else {
         alert("Invalid role!");

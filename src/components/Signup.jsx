@@ -11,7 +11,6 @@ function Signup() {
     e.preventDefault();
     try {
       const response = await axios.post("http://localhost:5000/signup", { email, password });
-      alert(response.data.message);
       window.location.href = "/";
     } catch (err) {
       alert(err.response?.data?.message || "An error occurred");
